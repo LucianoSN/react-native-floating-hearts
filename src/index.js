@@ -17,7 +17,7 @@ const HeartContainer = () => {
 };
 
 const Index = () => {
-    const [hearts, setHearts] = useState([]);
+    const [hearts, setHearts] = useState([{}]);
     const [heartCount, setHeartCount] = useState(1);
 
     const addHeart = () => {
@@ -32,11 +32,7 @@ const Index = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.container}>
-                {hearts.map(heart => {
-                    return <HeartContainer key={heart.id} />;
-                })}
-            </View>
+            <View style={styles.container}>{hearts.map(heart => {})}</View>
             <TouchableOpacity onPress={addHeart} style={styles.addButton}>
                 <AntDesign name="plus" size={24} color="#FFF" />
             </TouchableOpacity>
