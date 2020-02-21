@@ -12,8 +12,6 @@ import {
 import { AntDesign } from '@expo/vector-icons';
 
 const { height } = Dimensions.get('window');
-const animationEndY = Math.ceil(height * 0.7);
-const negativeEndY = animationEndY * -1;
 
 const Heart = props => (
     <View {...props} style={[styles.heart, props.style]}>
@@ -27,10 +25,13 @@ const HeartContainer = props => {
     };
 
     useEffect(() => {
-        state.position.interpolate({
-            inputRange: [negativeEndY, 0],
-            outputRange: [animationEndY, 0],
-        });
+        const animationEndY = Math.ceil(height * 0.7);
+        const negativeEndY = animationEndY * -1;
+
+        // state.position.interpolate({
+        //     inputRange: [negativeEndY, 0],
+        //     outputRange: [animationEndY, 0],
+        // });
 
         Animated.timing(state.position, {
             duration: 2000,
