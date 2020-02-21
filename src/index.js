@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
+
+import {
+    StyleSheet,
+    View,
+    TouchableOpacity,
+    Animated,
+    Dimensions,
+    Easing,
+} from 'react-native';
+
 import { AntDesign } from '@expo/vector-icons';
+
+const { height } = Dimensions.get('window');
+const animationEndY = Math.ceil(height * 0.7);
+const negativeEndY = animationEndY * -1;
 
 const Heart = props => (
     <View {...props} style={[styles.heart, props.style]}>
@@ -8,9 +21,35 @@ const Heart = props => (
     </View>
 );
 
-const HeartContainer = () => {
+const HeartContainer = props => {
+    const state = {
+        position: new Animated.Value(0),
+    };
+
+    useEffect(() => {
+        state.position.interpolate({
+            inputRange: [negativeEndY, 0],
+            outputRange: [animationEndY, 0],
+        });
+
+        Animated.timing(state.position, {
+            duration: 2000,
+            toValue: negativeEndY,
+            easing: Easing.ease,
+            useNativeDriver: true,
+        }).start();
+    }, [state.position]);
+
+    const getHeartStyle = () => {
+        return {
+            transform: [{ translateY: state.position }],
+        };
+    };
+
     return (
-        <Animated.View style={[styles.heartContainer]}>
+        <Animated.View
+            style={[styles.heartContainer, getHeartStyle(), props.style]}
+        >
             <Heart color="purple" />
         </Animated.View>
     );
@@ -18,23 +57,31 @@ const HeartContainer = () => {
 
 const Index = () => {
     const [hearts, setHearts] = useState([]);
-    const [heartCount, setHeartCount] = useState(1);
+    const [heartCount, setHeartCount] = useState(0);
 
     const addHeart = () => {
         setHeartCount(heartCount + 1);
+
+        setHearts([
+            ...hearts,
+            { id: heartCount, right: getRandomNumber(20, 150) },
+        ]);
     };
 
-    useEffect(() => {
-        setHearts({
-            id: heartCount,
-        });
-    }, [heartCount]);
+    const getRandomNumber = (min, max) => {
+        return Math.random() * (max - min) + min;
+    };
 
     return (
         <View style={styles.container}>
             <View style={styles.container}>
                 {hearts.length > 0 &&
-                    hearts.map(heart => <HeartContainer key={heart.id} />)}
+                    hearts.map(heart => (
+                        <HeartContainer
+                            key={heart.id}
+                            style={{ right: heart.right }}
+                        />
+                    ))}
             </View>
 
             <TouchableOpacity onPress={addHeart} style={styles.addButton}>
