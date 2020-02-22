@@ -44,6 +44,12 @@ export default class Home extends React.Component {
         );
     };
 
+    removeHeart = id => {
+        this.setState({
+            hearts: this.state.hearts.filter(heart => heart.id !== id),
+        });
+    };
+
     render() {
         return (
             <View style={styles.container}>
@@ -52,6 +58,7 @@ export default class Home extends React.Component {
                         <HeartContainer
                             key={heart.id}
                             style={{ right: heart.right }}
+                            onCompleted={() => this.removeHeart(heart.id)}
                         />
                     ))}
                 </View>
@@ -71,6 +78,10 @@ class HeartContainer extends React.Component {
         position: new Animated.Value(0),
     };
 
+    static defaultProps = {
+        onCompleted() {},
+    };
+
     componentDidMount() {
         // this.yAnimation = this.state.position.interpolate({
         //     inputRange: [negativeEndY, 0],
@@ -82,7 +93,7 @@ class HeartContainer extends React.Component {
             toValue: negativeEndY,
             easing: Easing.ease,
             useNativeDriver: true,
-        }).start();
+        }).start(this.props.onCompleted);
     }
 
     getHeartStyle = () => {
