@@ -58,7 +58,7 @@ export default class Home extends React.Component {
                         <HeartContainer
                             key={heart.id}
                             style={{ right: heart.right }}
-                            onCompleted={() => this.removeHeart(heart.id)}
+                            onComplete={() => this.removeHeart(heart.id)}
                         />
                     ))}
                 </View>
@@ -74,31 +74,50 @@ export default class Home extends React.Component {
 }
 
 class HeartContainer extends React.Component {
+    constructor() {
+        super();
+
+        this.yAnimation = this.state.position.interpolate({
+            inputRange: [negativeEndY, 0],
+            outputRange: [animationEndY, 0],
+        });
+
+        this.opacityAnimation = this.yAnimation.interpolate({
+            inputRange: [0, animationEndY],
+            outputRange: [1, 0],
+        });
+
+        this.scaleAnimation = this.yAnimation.interpolate({
+            inputRange: [0, 15, 30],
+            outputRange: [0, 1.4, 1],
+            extrapolate: 'clamp',
+        });
+    }
+
     state = {
         position: new Animated.Value(0),
     };
 
     static defaultProps = {
-        onCompleted() {},
+        onComplete() {},
     };
 
     componentDidMount() {
-        // this.yAnimation = this.state.position.interpolate({
-        //     inputRange: [negativeEndY, 0],
-        //     outputRange: [animationEndY, 0],
-        // });
-
         Animated.timing(this.state.position, {
             duration: 2000,
             toValue: negativeEndY,
             easing: Easing.ease,
             useNativeDriver: true,
-        }).start(this.props.onCompleted);
+        }).start(this.props.onComplete);
     }
 
     getHeartStyle = () => {
         return {
-            transform: [{ translateY: this.state.position }],
+            transform: [
+                { translateY: this.state.position },
+                { scale: this.scaleAnimation },
+            ],
+            opacity: this.opacityAnimation,
         };
     };
 
