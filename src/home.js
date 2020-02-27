@@ -22,6 +22,14 @@ const getRandomNumber = (min, max) => {
     return Math.random() * (max - min) + min;
 };
 
+const getRandomColor = () => {
+    return `rgb(
+        ${getRandomNumber(100, 144)}, 
+        ${getRandomNumber(10, 200)}, 
+        ${getRandomNumber(200, 244)}
+    )`;
+};
+
 export default class Home extends React.Component {
     state = {
         hearts: [],
@@ -35,6 +43,7 @@ export default class Home extends React.Component {
                     {
                         id: heartCount,
                         right: getRandomNumber(20, 150),
+                        color: getRandomColor(),
                     },
                 ],
             },
@@ -59,6 +68,7 @@ export default class Home extends React.Component {
                             key={heart.id}
                             style={{ right: heart.right }}
                             onComplete={() => this.removeHeart(heart.id)}
+                            color={heart.color}
                         />
                     ))}
                 </View>
@@ -88,9 +98,31 @@ class HeartContainer extends React.Component {
         });
 
         this.scaleAnimation = this.yAnimation.interpolate({
-            inputRange: [0, 15, 30],
+            inputRange: [0, 5, 30],
             outputRange: [0, 1.4, 1],
             extrapolate: 'clamp',
+        });
+
+        this.xAnimation = this.yAnimation.interpolate({
+            inputRange: [
+                0,
+                animationEndY / 6,
+                animationEndY / 3,
+                animationEndY / 2,
+                animationEndY,
+            ],
+            outputRange: [0, 25, 15, 0, 10],
+        });
+
+        this.rotateAnimation = this.yAnimation.interpolate({
+            inputRange: [
+                0,
+                animationEndY / 6,
+                animationEndY / 3,
+                animationEndY / 2,
+                animationEndY,
+            ],
+            outputRange: ['0deg', '-5deg', '0deg', '5deg', '0deg'],
         });
     }
 
@@ -115,7 +147,9 @@ class HeartContainer extends React.Component {
         return {
             transform: [
                 { translateY: this.state.position },
+                { translateX: this.xAnimation },
                 { scale: this.scaleAnimation },
+                { rotate: this.rotateAnimation },
             ],
             opacity: this.opacityAnimation,
         };
@@ -130,7 +164,7 @@ class HeartContainer extends React.Component {
                     this.props.style,
                 ]}
             >
-                <Heart color="purple" />
+                <Heart color={this.props.color} />
             </Animated.View>
         );
     }
